@@ -7,7 +7,8 @@ fun main() {
 //    jobInTheContext()
 //    childrenOfCoroutine()
 //    parentalResponsibilities()
-    namingCoroutineForDebug()
+//    namingCoroutineForDebug()
+    combiningContextElements()
 }
 
 fun dispatchersThread() = runBlocking {
@@ -76,7 +77,7 @@ fun childrenOfCoroutine() = runBlocking {
             println("job1: I run in my own Job and execute independently!")
             delay(1000L)
             println("job1: I am not affected by cancellation of the request")
-        }
+        } // example of 2.
 
         launch {
             delay(100)
@@ -91,6 +92,9 @@ fun childrenOfCoroutine() = runBlocking {
     println("main: Who has survived request cancellation?")
     delay(1000L)
 }
+// parent-child 는 2가지 형식으로 override 될 수 있다.
+// 1. GlobalScope 와 같이 제일 외부에서 선언된 coroutineScope 들은 parent 로 부터 Job을 상속 받지 않는다.
+// 2. coroutine 에 새로운 Job 을 넘겨 받을 경우, parent scope 의 job 을 덮어쓴다.
 
 fun parentalResponsibilities() = runBlocking {
     val request = launch {
@@ -125,4 +129,10 @@ fun namingCoroutineForDebug() = runBlocking {
 
 
     log("The answer for v1 / v2 = ${v1.await() / v2.await()}")
+}
+
+fun combiningContextElements() = runBlocking {
+    launch(Dispatchers.Default + CoroutineName("test")) {
+        println("I'm working in thread ${Thread.currentThread().name}")
+    }
 }

@@ -3,6 +3,14 @@ import java.lang.Exception
 
 fun main() {
     println("Testing Cancellation and Timeout in Coroutines")
+    coroutineTimeOutOrNull()
+
+    cancelCoroutine()
+
+    cooperativeCancelTest()
+
+
+    cancelComputationCoroutine()
 }
 
 fun cancelCoroutine() = runBlocking {
@@ -24,7 +32,8 @@ fun cancelCoroutine() = runBlocking {
     job.cancel()
     job.join()
     println("main : Now I can quit.")
-}
+} // simple logic for cancel coroutine
+
 fun cooperativeCancelTest() = runBlocking {
     val startTime = System.currentTimeMillis()
     val job = launch(Dispatchers.Default) {
@@ -53,7 +62,7 @@ fun cooperativeCancelTest() = runBlocking {
     job.cancelAndJoin()
     println("main: Now I can quit")
 
-}
+} //while 문이 돌아가는동안 coroutine 을 취소 할 수 없다. cpu 를 사용하고 있는 computing 과정에서는 cancel 할 수 없어 보인다.
 
 fun checkCancelError() = runBlocking {
     val job = launch {
@@ -73,7 +82,7 @@ fun checkCancelError() = runBlocking {
     job.cancel()
     job.join()
     println("main: Now I can quit")
-}
+} // coroutine cancel 시 Exception 확인.
 
 fun cancelComputationCoroutine () = runBlocking {
     val startTime = System.currentTimeMillis()
@@ -96,7 +105,7 @@ fun cancelComputationCoroutine () = runBlocking {
     println("main : I'm tired of waiting!")
     job.cancelAndJoin()
     println("main : Now i can quit.")
-}
+} // coroutine Scope 에서 제공하는 isActive 를 통해서 while 과 같은 computing process 또한 정지 시킬 수 있다.
 
 fun closeResourceWithFinally() = runBlocking {
     val job = launch {
@@ -126,8 +135,10 @@ fun nonCancellableBlock() = runBlocking {
                 delay(500L)
             }
         } finally {
-            //일반적인 Dispathcer를 사용하면 cancel이 되지만, NonCancellable을 Context로
-            //넘겨줌으로써 Suspend Function이 필요한 처리의 경우 아래와 같이 사용할 수 있다.
+
+            //일반적인 Dispatcher 를 사용하면 다른 coroutine Scope 랑 똑같이 cancel 이 되지만, NonCancellable 을 Context 로
+            //넘겨줌으로써 Suspend Function 이 필요한 처리의 경우 아래와 같이 사용할 수 있다.
+
             withContext(NonCancellable){
                 println("job: I'm running finally")
                 delay(1000L)
@@ -148,7 +159,7 @@ fun coroutineTimeOut() = runBlocking {
             println("I'm sleeping $it ...")
             delay(500L)
         }
-    } //kotlinx.coroutines.TimeoutCancellationException: TimeoutExeption 은 CancellationException 의 하위 클래스 이다.
+    } //kotlinx.coroutines.TimeoutCancellationException: TimeoutException 은 CancellationException 의 하위 클래스 이다.
 }
 
 fun coroutineTimeOutOrNull() = runBlocking {

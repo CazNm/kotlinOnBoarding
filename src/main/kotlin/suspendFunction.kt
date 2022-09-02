@@ -57,7 +57,7 @@ fun sequentialLazyAsync()  = runBlocking {
         val one = async ( start = CoroutineStart.LAZY ) { doSomethingUsefulOne() }
         val two = async ( start = CoroutineStart.LAZY ) { doSomethingUsefulTwo() }
 
-        one.start()
+        one.start() //Lazy 를 할당해서 직접 시작할 수 있음
         two.start()
         println("The answer is ${one.await() + two.await()}")
     }
@@ -68,7 +68,7 @@ fun sequentialLazyAsync()  = runBlocking {
 fun sequentialAsyncStyle()  {
     val time = measureTimeMillis {
         val one = somethingUsefulOneAsync()
-        val two = somethingUsefulOneAsync()
+        val two = somethingUsefulTwoAsync()
 
         runBlocking {
             println("The answer is ${one.await() + two.await()}")
